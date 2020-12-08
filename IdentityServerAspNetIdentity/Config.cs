@@ -17,7 +17,7 @@ namespace IdentityServerAspNetIdentity
                 new IdentityResources.Profile(),
                 new IdentityResources.Email(),
                 // Identity Resource for custom user claim type
-                new IdentityResource("appUser_claim", new []{"appUser_claim"})
+                new IdentityResource("appuser_claim", new []{"appuser_claim"})
             };
 
 
@@ -27,7 +27,7 @@ namespace IdentityServerAspNetIdentity
                 // By assigning the user claim to the api resource, we are instructing Identity Server to include that claim in Access tokens for this resource.
                 new ApiResource("identityApi", 
                                 "Identity Claims Api", 
-                                 new []{"appUser_claim"})
+                                 new []{"appuser_claim"})
             };
 
         public static IEnumerable<Client> Clients =>
@@ -61,16 +61,11 @@ namespace IdentityServerAspNetIdentity
                     PostLogoutRedirectUris = { "https://localhost:44321/signout-callback-oidc" },
 
                     // allowed scopes - include Api Resources and Identity Resources that may be accessed by this client
-                    AllowedScopes = { "openid", "profile", "email", "identityApi","appUser_claim" },
+                    AllowedScopes = { "openid", "profile", "email", "identityApi","appuser_claim" },
 
                     // include the refresh token
                    AllowOfflineAccess = true
                 }
             };
-    
-    
     }
-
-
-
 }

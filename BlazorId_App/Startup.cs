@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Net.Http.Headers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication;
@@ -30,14 +29,6 @@ namespace BlazorId_App
             services.AddServerSideBlazor();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            //create an HTTP client for accessing the API
-            services.AddHttpClient("ApiClient", client =>
-            {
-                client.BaseAddress = new Uri("http://localhost:5001/");
-                client.DefaultRequestHeaders.Clear();
-                client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
-            });
-
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -57,14 +48,14 @@ namespace BlazorId_App
                     options.Scope.Add("email");
                     options.Scope.Add("offline_access");
 
-                    //Scope for accessing API
+                    // Scope for accessing API
                     options.Scope.Add("identityApi"); //invalid scope for client
 
                     // Scope for custom user claim
-                         options.Scope.Add("appUser_claim"); //invalid scope for client
+                    options.Scope.Add("appuser_claim"); //invalid scope for client
 
                     // map custom user claim 
-                    options.ClaimActions.MapUniqueJsonKey("appUser_claim", "appUser_claim");
+                    options.ClaimActions.MapUniqueJsonKey("appuser_claim", "appuser_claim");
                    
                     //options.CallbackPath = ...
                     options.SaveTokens = true;
@@ -80,11 +71,11 @@ namespace BlazorId_App
                     BlazorId_Shared.Policies.CanViewIdentityPolicy());
             });
 
-            services.AddHttpClient<IdentityDataService, IdentityDataService>(client =>
-            {
-                client.BaseAddress = new Uri("http://localhost:5001/");
-            });
-        }
+			services.AddHttpClient<IdentityDataService, IdentityDataService>(client =>
+			{
+				client.BaseAddress = new Uri("http://localhost:44328/");
+			});
+		}
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
