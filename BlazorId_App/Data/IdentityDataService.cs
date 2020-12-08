@@ -3,12 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Runtime.InteropServices.ComTypes;
-using System.Security.Claims;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace BlazorId_App.Data
@@ -18,12 +14,11 @@ namespace BlazorId_App.Data
         private readonly HttpClient _httpClient;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private string _userClaims;
+
         public IdentityDataService(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
         {
-            _httpClient = httpClient ??
-               throw new System.ArgumentNullException(nameof(httpClient));
-            _httpContextAccessor = httpContextAccessor ??
-                throw new System.ArgumentNullException(nameof(httpContextAccessor));
+            _httpClient= httpClient?? throw new System.ArgumentNullException(nameof(httpClient));
+            _httpContextAccessor = httpContextAccessor ?? throw new System.ArgumentNullException(nameof(httpContextAccessor));
         }
 
         // Get user claims json from the API get method
@@ -32,7 +27,7 @@ namespace BlazorId_App.Data
             var accessToken = await _httpContextAccessor.HttpContext.GetTokenAsync("access_token");
             if (accessToken != null)
             {
-                _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
+	            _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
             }
 
             HttpResponseMessage response = null ;
