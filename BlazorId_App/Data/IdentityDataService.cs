@@ -33,15 +33,15 @@ namespace BlazorId_App.Data
             HttpResponseMessage response = null ;
             try
             {
-               response = await _httpClient.GetAsync($"identity");
+                response = await _httpClient.GetAsync($"identity");
                 response.EnsureSuccessStatusCode();
             }
             catch (HttpRequestException e)
             {
                 return e.Message;
             }
-            string rawJson = await response.Content.ReadAsStringAsync();
-            JToken parsedJson = JToken.Parse(rawJson);
+            var rawJson = await response.Content.ReadAsStringAsync();
+            var parsedJson = JToken.Parse(rawJson);
             return  parsedJson.ToString(Formatting.Indented);
             
         }
@@ -52,20 +52,12 @@ namespace BlazorId_App.Data
         /// <returns></returns>
         public async Task<string> GetAPPUserClaimsJson()
         {
-            JObject jo;
-            try
-            {
-                var claimsList = _httpContextAccessor.HttpContext.User.Claims;
+            var claimsList = _httpContextAccessor.HttpContext.User.Claims;
 
-                var rawList = (from c in claimsList select new { c.Type, c.Value });
-                string json = JsonConvert.SerializeObject(rawList, Formatting.Indented);
+            var rawList = (from c in claimsList select new { c.Type, c.Value });
+            var json = JsonConvert.SerializeObject(rawList, Formatting.Indented);
 
-                return json;
-            }
-            catch(Exception e)
-            {
-                throw (e);
-            }
+            return json;
         }
     }
 }
