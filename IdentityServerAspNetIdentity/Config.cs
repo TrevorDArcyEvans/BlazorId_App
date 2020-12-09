@@ -23,7 +23,7 @@ namespace IdentityServerAspNetIdentity
 
         public static IEnumerable<ApiResource> Apis =>
             new List<ApiResource>
-            {   // Identity API, consumes user claim type 'appUser_claim'
+            {   // Identity API, consumes user claim type 'appuser_claim'
                 // By assigning the user claim to the api resource, we are instructing Identity Server to include that claim in Access tokens for this resource.
                 new ApiResource("identityApi", 
                                 "Identity Claims Api", 
