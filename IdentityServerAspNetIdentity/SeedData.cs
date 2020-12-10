@@ -59,7 +59,7 @@ namespace IdentityServerAspNetIdentity
                         new Claim(JwtClaimTypes.Address, @"{ 'street_address': 'One Hacker Way', 'locality': 'Heidelberg', 'postal_code': 69118, 'country': 'Germany' }", IdentityServer4.IdentityServerConstants.ClaimValueTypes.Json),
                         // Add user_scope claim for Identity to authorize UI and API actions. Wendy has this permission, Bob does not.
                         new Claim("appuser_claim","identity")
-                    }).Result;
+                        }).Result;
                         if (!result.Succeeded)
                         {
                             throw new Exception(result.Errors.First().Description);
