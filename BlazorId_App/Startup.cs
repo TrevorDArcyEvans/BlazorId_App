@@ -7,7 +7,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authentication;
 using BlazorId_App.Data;
 
 namespace BlazorId_App
@@ -28,6 +27,11 @@ namespace BlazorId_App
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            services.AddHttpClient<IdentityDataService, IdentityDataService>(client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:44328/");
+            });
 
             services.AddAuthentication(options =>
             {
@@ -53,29 +57,12 @@ namespace BlazorId_App
 
                     // Scope for custom user claim
                     options.Scope.Add("appuser_claim"); //invalid scope for client
-
-                    // map custom user claim 
-                    options.ClaimActions.MapUniqueJsonKey("appuser_claim", "appuser_claim");
-                   
+                    
                     //options.CallbackPath = ...
                     options.SaveTokens = true;
                     options.GetClaimsFromUserInfoEndpoint = true;
-
                 });
-
-            services.AddAuthorization(authorizationOptions =>
-            {
-                // add authorization poliy from shared project. This is the same policy used by the API
-                authorizationOptions.AddPolicy(
-                    BlazorId_Shared.Policies.CanViewIdentity,
-                    BlazorId_Shared.Policies.CanViewIdentityPolicy());
-            });
-
-			services.AddHttpClient<IdentityDataService, IdentityDataService>(client =>
-			{
-				client.BaseAddress = new Uri("https://localhost:44328/");
-			});
-		}
+        }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

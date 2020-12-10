@@ -10,10 +10,12 @@ namespace Api
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers()
+            services
+                .AddControllers()
                 .AddNewtonsoftJson();
 
-            services.AddAuthentication("Bearer")
+            services
+                .AddAuthentication("Bearer")
                 .AddJwtBearer("Bearer", options =>
                 {
                     options.Authority = "https://localhost:44387";
@@ -22,23 +24,17 @@ namespace Api
                     options.Audience = "identityApi";
                 });
 
-            services.AddCors(options =>
-            {
-                // this defines a CORS policy called "default"
-                options.AddPolicy("default", policy =>
+            services
+                .AddCors(options =>
                 {
-                    policy.WithOrigins("https://localhost:44321")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod();
+                    // this defines a CORS policy called "default"
+                    options.AddPolicy("default", policy =>
+                    {
+                        policy.WithOrigins("https://localhost:44321")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    });
                 });
-            });
-
-            services.AddAuthorization(authorizationOptions =>
-            {
-                authorizationOptions.AddPolicy(
-                    BlazorId_Shared.Policies.CanViewIdentity,
-                    BlazorId_Shared.Policies.CanViewIdentityPolicy());
-            });
         }
 
         public void Configure(IApplicationBuilder app)

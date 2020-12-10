@@ -1,8 +1,9 @@
 ﻿@page "/identityapp"
 
 @using BlazorId_App.Data
+
 @inject IdentityDataService IdentityService
-@attribute [Authorize(Policy=BlazorId_Shared.Policies.CanViewIdentity)]
+@attribute [Authorize]
 
 <h1>User Claims from APP</h1>
 
@@ -23,7 +24,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        string claimsJson = 
         userClaimsJson = await IdentityService.GetAPPUserClaimsJson();
     }
 }

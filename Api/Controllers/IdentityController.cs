@@ -4,7 +4,6 @@
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using BlazorId_Shared;
 
 namespace Api.Controllers
 {
@@ -13,7 +12,6 @@ namespace Api.Controllers
     public class IdentityController : ControllerBase
     {
         [HttpGet]
-        [Authorize(Policy = Policies.CanViewIdentity)]
         public IActionResult Get()
         {
             return new JsonResult(from c in User.Claims select new { c.Type, c.Value });
