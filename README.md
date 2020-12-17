@@ -139,9 +139,8 @@ new Client
 public class IdentityController : ControllerBase
 {
     [HttpGet]
-    // Use samed shared authorization policy to protect the api GET method that is used to protect the application feature
-    // This checks for the user claim type appRole_Claim with value "identity".
-    [Authorize(Policy = Policies.CanViewIdentity)]
+    // Use authorization to protect the api GET method that is used to protect the application feature
+    [Authorize]
     public IActionResult Get()
     {
         // return the claim set of the current API user as Json
@@ -152,14 +151,16 @@ public class IdentityController : ControllerBase
 
  ## Startup.ConfigureServices
 ```c#
-    services.AddControllers()
+    services
+        .AddControllers()
         .AddNewtonsoftJson();
 
     // configure bearer token authentication
-    services.AddAuthentication("Bearer")
+    services
+        .AddAuthentication("Bearer")
         .AddJwtBearer("Bearer", options =>
         {
-            //IDentityServer url
+            // IdentityServer url
             options.Authority = "https://localhost:44387";
             
             // RequireHttpsMetadata must be true in production
@@ -168,17 +169,6 @@ public class IdentityController : ControllerBase
             // Audience is api Resource name
             options.Audience = "identityApi";
         });
-
-    services.AddAuthorization(authorizationOptions =>
-    {
-        // add authorization policy from Shared project 
-        // the same policy is used by the application to secure the button that calls the api.
-        // This policy checks for the presence of the userApp_claim with value "identity".
-        // The api also has authorization in place at the controller level provided by IdentityServer
-        authorizationOptions.AddPolicy(
-            BlazorId_Shared.Policies.CanViewIdentity,
-            BlazorId_Shared.Policies.CanViewIdentityPolicy());
-    });
  ```
 
 ### Startup.Configure
@@ -188,7 +178,7 @@ public void Configure(IApplicationBuilder app)
     app.UseRouting();
 
     // add authentication first, followed by authorization
-    //     these two should come after app.UseRouting but before app.UseEndpoints
+    // these two should come after app.UseRouting but before app.UseEndpoints
     app.UseAuthentication();
     app.UseAuthorization();
     
@@ -209,50 +199,41 @@ public void Configure(IApplicationBuilder app)
  ### Startup.ConfigureServices
  **Configure Authentication (OIDC) and Authorization services**
  ```c#
-            services.AddAuthentication(options =>
-            {
-                // the application's main authentication scheme will be cookies
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                
-                // the authentication challenge will be handled by the OIDC middleware, and ultimately IdentityServer  
-                options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-            })
-                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme,
-                options =>
-                {
-                    options.Authority = "https://localhost:44387/";
-                    options.ClientId = "BlazorID_App";
-                    options.ClientSecret = "secret";
-                    options.UsePkce = true;
-                    options.ResponseType = "code";
-                    options.Scope.Add("openid");
-                    options.Scope.Add("profile");
-                    options.Scope.Add("email");
-                    options.Scope.Add("offline_access");
+services.AddAuthentication(options =>
+{
+    // the application's main authentication scheme will be cookies
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    
+    // the authentication challenge will be handled by the OIDC middleware, and ultimately IdentityServer  
+    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+})
+.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
+.AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme,
+options =>
+{
+    options.Authority = "https://localhost:44387/";
+    options.ClientId = "BlazorID_App";
+    options.ClientSecret = "secret";
+    options.UsePkce = true;
+    options.ResponseType = "code";
+    options.Scope.Add("openid");
+    options.Scope.Add("profile");
+    options.Scope.Add("email");
+    options.Scope.Add("offline_access");
 
-                    //Scope for accessing API
-                    options.Scope.Add("identityApi"); 
+    //Scope for accessing API
+    options.Scope.Add("identityApi"); 
 
-                    // Scope for custom user claim
-                    options.Scope.Add("appUser_claim"); 
+    // Scope for custom user claim
+    options.Scope.Add("appUser_claim"); 
 
-                    // map custom user claim 
-                    options.ClaimActions.MapUniqueJsonKey("appUser_claim", "appUser_claim");
-                   
-                    //options.CallbackPath = ...
-                    options.SaveTokens = true;
-                    options.GetClaimsFromUserInfoEndpoint = true;
-
-                });
- 
-            services.AddAuthorization(authorizationOptions =>
-            {
-                // add authorization poliy from shared project. This is the same policy used by the API
-                authorizationOptions.AddPolicy(
-                    BlazorId_Shared.Policies.CanViewIdentity,
-                    BlazorId_Shared.Policies.CanViewIdentityPolicy());
-            });
+    // map custom user claim 
+    options.ClaimActions.MapUniqueJsonKey("appUser_claim", "appUser_claim");
+   
+    //options.CallbackPath = ...
+    options.SaveTokens = true;
+    options.GetClaimsFromUserInfoEndpoint = true;
+});
 ...
  ```
  ### Startup.Configure
@@ -262,7 +243,8 @@ public void Configure(IApplicationBuilder app)
   3. UseAuthentication
   4. UseAuthorization
   5. UseEndpoints
- ```c
+
+```c#
 if (env.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -286,7 +268,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapBlazorHub();
     endpoints.MapFallbackToPage("/_Host");
 });
- ```
+```
 
  ## Logging in and out
  A Blazor component cannot correctly redirect to the IdentityServer Login and Login functions on its own.<br/><br/>
@@ -346,17 +328,14 @@ After referencing this nuget package, simply direct logins to "/LoginIDP" and lo
 
 **Identity-Api.razor**
 * The Authorize attribute in the Identity-Api component performs an Authorization check when a user attempts to access the component.
-* It uses the same authorization policy as the API, **CanViewIdentity**, located in the shared project. 
 
 ```razor
 @page "/identityapi"
-@attribute [Authorize(Policy = BlazorId_Shared.Policies.CanViewIdentity)]
+@attribute [Authorize]
 ```
-
 ### CascadingAuthenticationState Component
 * Authentication in SignalR apps is established with the initial connection. 
 * The CascadingAuthenticationState component receives the authentication information upon intial connection and cascades this information to all descendant components.<br/><br/>  
-
 
 ### AuthorizeRouteView component 
 * Configured in App.razor
@@ -397,8 +376,8 @@ After referencing this nuget package, simply direct logins to "/LoginIDP" and lo
  * When authorization succeeds, the code in the **Authorized** section is activated and the markup content generated within that section will be rendered.
  * When the authorization fails, the code in the **NotAuthorized** section is activated and the razor code within that section will be rendered.
  * Used in NavMenu.razor to hide navigation links for unauthorized users. 
-
  <br/>
+ 
  **NavMenu.razor** <br/>
  *    The authorized user sees all Links except Login
  *    The unauthorized user only sees the Login link 
