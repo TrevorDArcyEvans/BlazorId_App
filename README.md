@@ -62,9 +62,11 @@ dotnet new is4aspid -n IdentityServerAspNetIdentity
 
 ## User with custom claim
 Users and claims for testing are created in SeedData.cs. <br/>
-For the Alice user only, add a custom claim of type appUser_claim with value **identity**<br/><br/>
+For the Alice user only, add a custom claim of type appUser_claim with value **identity**<br/>
 
-**SeedData.cs**<br/>
+<details>
+<summary><b>SeedData.cs</b></summary>
+
 ```c#
 result = userMgr.AddClaimsAsync(alice, new Claim[]{
              new Claim(JwtClaimTypes.GivenName, "Alice"),
@@ -82,6 +84,8 @@ result = userMgr.AddClaimsAsync(alice, new Claim[]{
              new Claim("appUser_claim","identity")
 
 ```
+
+</details>
 
 ## Identity Resource
 A custom Identity Resource is required in IdentityServer to control access to the custom claim type **appUser_claim**  for client applications and apis.<br/><br/>
