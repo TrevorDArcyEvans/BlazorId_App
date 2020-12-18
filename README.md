@@ -13,19 +13,19 @@ This example solution demonstrates how to:
 This application provides two protected features that allow the user to view all claims that have been assigned, and to 
 differentiate between the Application user claims set and the API user claims set.
 
-### APP Identity 
+### APP Identity
 Navigation Menu Item: displays the claims of the current User identity for the application.<br/> 
 
-### API Identity 
+### API Identity
 Navigation Menu Item: calls a test API, which is protected by IdentityServer. The API will return the user claims it 
 received with the request as JSON. The application then displays those claims to the User. 
 
 ### Authorization
 The sample solution demonstrates 4 layers of security:
 1. **Application Routing:** Block application route paths for unauthorized users 
-2. **Application Navigation:** Hide navigation links for unauthorized users
-3. **API User** Deny API access to unauthorized users
-4. **API Client** Deny API access to unauthorized clients
+1. **Application Navigation:** Hide navigation links for unauthorized users
+1. **API User** Deny API access to unauthorized users
+1. **API Client** Deny API access to unauthorized clients
 
 </details>
 
@@ -88,9 +88,11 @@ result = userMgr.AddClaimsAsync(alice, new Claim[]{
 </details>
 
 ## Identity Resource
-A custom Identity Resource is required in IdentityServer to control access to the custom claim type **appUser_claim**  for client applications and apis.<br/><br/>
+A custom Identity Resource is required in IdentityServer to control access to the custom claim type **appUser_claim**  for client applications and apis.<br/>
 
-**Config.cs**<br/>
+<details>
+<summary><b>Config.cs</b></summary>
+
 ```c#
 new List<IdentityResource>
 {
@@ -102,11 +104,15 @@ new List<IdentityResource>
 };
 ```
 
+</details>
+
 ## Api Resource
 A custom API Resource is required in IdentityServer to control access to the API and specify 
-which user claims should be included in the access token.<br/><br/>
+which user claims should be included in the access token.<br/>
 
-**Config.cs**<br/>
+<details>
+<summary><b>Config.cs</b></summary>
+
 ```c#
 new List<ApiResource>
 {
@@ -120,10 +126,14 @@ new List<ApiResource>
 };
 ```
 
-## Client
-A client must be configured in Identity Server that has access to the API Resource and the Identity Resource.<br/><br/>
+</details>
 
-**Config.cs**<br/>
+## Client
+A client must be configured in Identity Server that has access to the API Resource and the Identity Resource.<br/>
+
+<details>
+<summary><b>Config.cs</b></summary>
+
 ```c#
 // interactive ASP.NET Core Blazor Server Client
 new Client
@@ -157,7 +167,9 @@ new Client
    // offline_access scope must be added in the OIDC settings in client Startup.ConfigureServices
    AllowOfflineAccess = true
 }
- ```
+```
+
+</details>
 
 </details>
 
@@ -165,14 +177,18 @@ new Client
 
 <details>
 
- The demo API was created from the standard ASP.NET Core Web API template.
- ```shell
- dotnet new web -n Api
- ```
+The demo API was created from the standard ASP.NET Core Web API template.
+```shell
+dotnet new web -n Api
+```
 
 ## IdentityController
- Add a new Controller to the project named IdentityController with the following code:
- ```c#
+Add a new Controller to the project named IdentityController with the following code:<br/>
+
+<details>
+<summary><b>IdentityController.cs</b></summary>
+
+```c#
 //create base controller route
 [Route("api/identity")]
 
@@ -195,9 +211,15 @@ public class IdentityController : ControllerBase
         return new JsonResult(from c in User.Claims select new { c.Type, c.Value });
     }
 }
- ```
+```
+
+</details>
 
 ## Startup.ConfigureServices
+
+<details>
+<summary><b>Startup.cs:ConfigureServices</b></summary>
+
 ```c#
     services
         .AddControllers()
@@ -217,9 +239,15 @@ public class IdentityController : ControllerBase
             // Audience is api Resource name
             options.Audience = "identityApi";
         });
- ```
+```
+
+</details>
 
 ## Startup.Configure
+
+<details>
+<summary><b>Startup.cs:Configure</b></summary>
+
 ```c#
 public void Configure(IApplicationBuilder app)
 {
@@ -239,22 +267,28 @@ public void Configure(IApplicationBuilder app)
 
 </details>
 
- # Step 3 Configure the Blazor Server Application
+</details>
 
- <details>
+# Step 3 Configure the Blazor Server Application
 
- The demo Blazor Server App was created from the standard ASP.NET Core Blazor Server template.
- ```shell
- dotnet new blazorserver -n BlazorId_App
- ```
+<details>
+
+The demo Blazor Server App was created from the standard ASP.NET Core Blazor Server template.
+```shell
+dotnet new blazorserver -n BlazorId_App
+```
 
 ## OIDC Settings
 
 <details>
 
 ### Startup.ConfigureServices
- **Configure Authentication (OIDC) and Authorization services**
- ```c#
+**Configure Authentication (OIDC) and Authorization services**
+
+<details>
+<summary><b>Startup.cs:ConfigureServices</b></summary>
+
+```c#
 services.AddAuthentication(options =>
 {
     // the application's main authentication scheme will be cookies
@@ -292,15 +326,20 @@ options =>
     options.GetClaimsFromUserInfoEndpoint = true;
 });
 ...
- ```
+```
+
+</details>
 
 ### Startup.Configure
   **Add services to the request pipeline in correct processing order:**
-  1. UseStaticFiles 
-  2. UseRouting
-  3. UseAuthentication
-  4. UseAuthorization
-  5. UseEndpoints
+  1. UseStaticFiles
+  1. UseRouting
+  1. UseAuthentication
+  1. UseAuthorization
+  1. UseEndpoints
+
+<details>
+<summary><b>Startup.cs:ConfigureServices</b></summary>
 
 ```c#
 if (env.IsDevelopment())
@@ -330,18 +369,23 @@ app.UseEndpoints(endpoints =>
 
 </details>
 
+</details>
+
 ## Logging in and out
 
 <details>
 
- A Blazor component cannot correctly redirect to the IdentityServer Login and Login functions on its own.<br/><br/>
- For signing in and out, the HttpResponse must be modified by adding a cookie - but a pure Blazor component starts the response immediately when it  is rendered and it cannot be changed afterward.<br/><br/>
- An intermediary razor page (or MVC view) must be used to interact with the OIDC middleware for logging in and out because the page is able to manipulate the response correctly before sending it.<br/><br/>
- These pages have a cs file only, with no markup code, and each has a single Get method that performs the required actions. <br/><br/>
- The real login and logout pages are centrally located in Identity Server.
- 
+A Blazor component cannot correctly redirect to the IdentityServer Login and Login functions on its own.<br/><br/>
+For signing in and out, the HttpResponse must be modified by adding a cookie - but a pure Blazor component starts the response immediately when it  is rendered and it cannot be changed afterward.<br/><br/>
+An intermediary razor page (or MVC view) must be used to interact with the OIDC middleware for logging in and out because the page is able to manipulate the response correctly before sending it.<br/><br/>
+These pages have a cs file only, with no markup code, and each has a single Get method that performs the required actions. <br/><br/>
+The real login and logout pages are centrally located in Identity Server.
+
 ### LoginIDP.cshtml.cs
 The LoginIDP page invokes the ChallengeAsync method on the OIDC scheme, triggering the redirect to IdentityServer for Authentication.
+
+<details>
+<summary><b>LoginIDP.cshtml.cs</b></summary>
 
 ```c#
 public async Task OnGetAsync()
@@ -359,8 +403,13 @@ public async Task OnGetAsync()
 }
 ```
 
+</details>
+
 ### LogoutIDP.Razor
 **The LogoutIDP page invokes the SignOutAsync method for both Authentication Schemes (Cookies and OIDC)**
+
+<details>
+<summary><b>LogoutIDP.Razor</b></summary>
 
 ```c#
 public async Task OnGetAsync()
@@ -371,14 +420,16 @@ public async Task OnGetAsync()
 }
 ```
 
+</details>
+
 ### BlazorRazor Razor Class Library
 **This sample project is using LoginIDP and LogoutIDP razor pages provided by Nuget package
 [BlazorRazor](https://www.nuget.org/packages/BlazorRazor/)**<br/>
 
 **BlazorID_App.csproj**<br/>
-  ```xml
-  <ItemGroup>
-    <PackageReference Include="BlazorRazor" Version="1.0.0" />
+```xml
+<ItemGroup>
+  <PackageReference Include="BlazorRazor" Version="1.0.0" />
 ```
 
 After referencing this nuget package, simply direct logins to "/LoginIDP" and logouts to "/LogoutIDP". <br/>
@@ -391,8 +442,8 @@ After referencing this nuget package, simply direct logins to "/LoginIDP" and lo
 </details>
 
 ## Using Authentication and Authorization in the UI 
- 
- <details>
+
+<details>
 
 ### Authorize attribute
 * Razor components support the use of Authorize attributes to trigger authorization checks on the component.<br/>
@@ -423,6 +474,9 @@ After referencing this nuget package, simply direct logins to "/LoginIDP" and lo
 * When the authorization fails, the code in the **NotAuthorized** element is activated and a denial message is returned to the caller instead of the page.
 * When the authorization succeeds, the code in the **NotAuthorized** element is **not** activated and the requeste is returned as usual.<br/>
 
+<details>
+<summary><b>App.razor</b></summary>
+
 ```xml
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(Program).Assembly">
@@ -443,6 +497,8 @@ After referencing this nuget package, simply direct logins to "/LoginIDP" and lo
 </CascadingAuthenticationState>
 ```
 
+</details>
+
 ### **AuthorizeView Component**
  * Organizes razor code into two sections, **Authorized** and **NotAuthorized**
  * When authorization succeeds, the code in the **Authorized** section is activated and the markup content generated within that section will be rendered.
@@ -453,8 +509,11 @@ After referencing this nuget package, simply direct logins to "/LoginIDP" and lo
  *    The authorized user sees all Links except Login
  *    The unauthorized user only sees the Login link 
 
+<details>
+<summary><b>NavMenu.razor</b></summary>
+
 ```html
- <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <ul class="nav flex-column">
         <AuthorizeView>
             <Authorized>
@@ -492,6 +551,8 @@ After referencing this nuget package, simply direct logins to "/LoginIDP" and lo
     </ul>
 </div>
 ```
+
+</details>
 
 </details>
 
