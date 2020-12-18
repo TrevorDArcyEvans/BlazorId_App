@@ -1,4 +1,4 @@
-# BlazorId_App
+# BlazorId_App ![logo](images/Blazor-IdentitServer-logo.png "Logo")
 
 **Sample Blazor Server Application (with IdentityServer and API)<br/>**
 This example solution demonstrates how to:
@@ -29,17 +29,9 @@ The sample solution demonstrates 4 layers of security:
 
 </details>
 
-# Architecture
-
-<details>
-
-![Architecture](images/BlazorId_App-architecture.png "Architecture")
-
-</details>
-
 # Screenshots
 
-<details>
+<details><br/>
 
 ![blazor-login](images/01-blazor-login.png "Blazor login")
 ![idsvr-login](images/02-idsvr-login.png "Identity Server login")
@@ -47,6 +39,14 @@ The sample solution demonstrates 4 layers of security:
 ![blazor-api-id](images/04-blazor-api-id.png "Blazor API Id")
 ![blazor-logout](images/05-blazor-logout.png "Blazor logout")
 ![idsvr-logout](images/06-idsvr-logout.png "Identity Server logout")
+
+</details>
+
+# Architecture
+
+<details><br/>
+
+![Architecture](images/BlazorId_App-architecture.png "Architecture")
 
 </details>
 
@@ -286,7 +286,7 @@ dotnet new blazorserver -n BlazorId_App
 **Configure Authentication (OIDC) and Authorization services**
 
 <details>
-<summary><b>Startup.cs:ConfigureServices</b></summary>
+<summary><b>Startup.ConfigureServices</b></summary>
 
 ```c#
 services.AddAuthentication(options =>
@@ -339,7 +339,7 @@ options =>
   1. UseEndpoints
 
 <details>
-<summary><b>Startup.cs:ConfigureServices</b></summary>
+<summary><b>Startup.Configure</b></summary>
 
 ```c#
 if (env.IsDevelopment())
